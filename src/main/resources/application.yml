@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      database: "machine_metrics"
+
+app:
+  seedMachineFile: "resources/seed/machines.csv"
+
+logging:
+  level:
+    - debug
