@@ -18,8 +18,9 @@ public class MachineParameterRouter {
     public RouterFunction<ServerResponse> parametersRoute(MachineParametersHandler machineParametersHandler) {
         return route()
                 .path("/parameters", builder -> builder
-                    .GET("", machineParametersHandler::listMachineParameters)
-                    .POST("", accept(MediaType.APPLICATION_JSON), machineParametersHandler::addMachineParameters)
+                        .GET("/statistics", accept(MediaType.APPLICATION_JSON), machineParametersHandler::getMachineParametersStatistics)
+                        .GET(machineParametersHandler::listMachineParameters)
+                        .POST(accept(MediaType.APPLICATION_JSON), machineParametersHandler::addMachineParameters)
                 )
                 .build();
     }

@@ -1,0 +1,4 @@
+spring:
+  data:
+    mongodb:
+      database: "machine_metrics_test"

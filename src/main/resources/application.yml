@@ -9,3 +9,5 @@ app:
 logging:
   level:
     - debug
+    - org.springframework.data.mongodb.core.ReactiveMongoTemplate: debug
+    - org.springframework.data.mongodb.repository.query: debug
