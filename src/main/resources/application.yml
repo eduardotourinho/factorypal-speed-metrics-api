@@ -4,6 +4,7 @@ spring:
       database: "machine_metrics"
 
 app:
+  defaultLastMinutesStatistics: 10
   seedMachineFile: "resources/seed/machines.csv"
 
 logging:

@@ -3,6 +3,9 @@ package com.factorypal.speedmetrics.handlers;
 import com.factorypal.speedmetrics.domain.entities.Parameter;
 import com.factorypal.speedmetrics.domain.repositories.MachineParametersRepository;
 import com.factorypal.speedmetrics.routers.MachineParameterRouter;
+import com.factorypal.speedmetrics.schemas.MachineParametersResponse;
+import com.factorypal.speedmetrics.schemas.MachineStatisticsResponse;
+import com.factorypal.speedmetrics.services.MachineParametersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MachineParameterRouter.class, MachineParametersHandler.class})
+@ContextConfiguration(classes = {MachineParameterRouter.class, MachineParametersHandler.class, MachineParametersService.class})
 @WebFluxTest
 class MachineParametersHandlerTest {
 
@@ -55,26 +58,27 @@ class MachineParametersHandlerTest {
                 .uri("/parameters")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Parameter.class)
-                .value(parameters -> {
-                    assertEquals("machine1", parameters.get(0).getMachineKey());
-                    assertEquals("speed", parameters.get(0).getKey());
-                    assertEquals(30d, parameters.get(0).getValue());
+                .expectBodyList(MachineParametersResponse.class)
+                .value(machines -> {
+                    assertEquals("machine1", machines.get(1).getMachine());
+                    var machine1Parameters = machines.get(1).getParameters();
+                    assertEquals(2, machine1Parameters.size());
 
-                    assertEquals("machine1", parameters.get(1).getMachineKey());
-                    assertEquals("latency", parameters.get(1).getKey());
-                    assertEquals(500d, parameters.get(1).getValue());
-
-                    assertEquals("machine2", parameters.get(2).getMachineKey());
-                    assertEquals("speed", parameters.get(2).getKey());
-                    assertEquals(20d, parameters.get(2).getValue());
+                    assertEquals("machine2", machines.get(0).getMachine());
+                    var machine2Parameters =  machines.get(0).getParameters();
+                    assertEquals(1,machine2Parameters.size());
                 });
     }
 
     @Test
     void addMachineParameters() {
         String json = "{\"machineKey\": \"embosser\", \"parameters\": {\"core_diameter\": 3, \"speed\": 20 }}";
-        when(repository.saveAll(any())).thenReturn(Flux.fromIterable(List.of()));
+        List<Parameter> parameters = List.of(
+                Parameter.builder().machineKey("embosser").key("core_diameter").value(3d).build(),
+                Parameter.builder().machineKey("embosser").key("speed").value(20d).build()
+        );
+
+        when(repository.saveAll(any())).thenReturn(Flux.fromIterable(parameters));
 
         webClient.post()
                 .uri("/parameters")

@@ -143,7 +143,7 @@ class MachineParametersRepositoryImplTest {
                 .create(statistics)
                 .assertNext(statistic -> {
                     assertNotNull(statistic);
-                    assertEquals("machine2", statistic.getMachineKey());
+                    assertEquals("machine1", statistic.getMachineKey());
                     assertEquals("load", statistic.getProperty());
                     assertEquals(1d, statistic.getMin());
                     assertEquals(30d, statistic.getMax());
@@ -161,7 +161,7 @@ class MachineParametersRepositoryImplTest {
                 })
                 .assertNext(statistic -> {
                     assertNotNull(statistic);
-                    assertEquals("machine1", statistic.getMachineKey());
+                    assertEquals("machine2", statistic.getMachineKey());
                     assertEquals("load", statistic.getProperty());
                     assertEquals(1d, statistic.getMin());
                     assertEquals(30d, statistic.getMax());

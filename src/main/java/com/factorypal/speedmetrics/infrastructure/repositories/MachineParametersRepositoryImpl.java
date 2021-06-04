@@ -29,10 +29,7 @@ public class MachineParametersRepositoryImpl implements MachineParametersReposit
 
     @Override
     public Flux<Parameter> saveAll(Collection<Parameter> parameters) {
-        var collectionName = mongoTemplate.getCollectionName(Parameter.class);
-        log.info(String.format("Saving %d parameters in collection: %s", parameters.size(), collectionName));
-
-        return mongoTemplate.insertAll(parameters);
+        return mongoTemplate.insertAll(parameters).log(log.getName());
     }
 
     /**
@@ -92,11 +89,11 @@ public class MachineParametersRepositoryImpl implements MachineParametersReposit
                 groupBy,
                 newestParameters
         );
-        return mongoTemplate.aggregate(aggregation, Parameter.class);
+        return mongoTemplate.aggregate(aggregation, Parameter.class).log(log.getName());
     }
 
     /**
-     * Calculate
+     * Calculates the metrics f
      * [
      *   {
      *     '$match': {
@@ -283,6 +280,7 @@ public class MachineParametersRepositoryImpl implements MachineParametersReposit
                 .and(AccumulatorOperators.Avg.avgOf("valueArray")).as("average")
                 .and(AggregationExpression.from(medianCond)).as("median");
 
+        SortOperation sortByMachine = Aggregation.sort(Sort.Direction.ASC, "machineKey", "property");
 
         TypedAggregation<Parameter> statisticsAggregation = Aggregation.newAggregation(
                 Parameter.class,
@@ -294,10 +292,11 @@ public class MachineParametersRepositoryImpl implements MachineParametersReposit
                 projectMiddles,
                 projectMiddleValues,
                 projectMiddleSum,
-                projectFinalValues
+                projectFinalValues,
+                sortByMachine
         );
 
-        log.info(statisticsAggregation.toString());
-        return mongoTemplate.aggregate(statisticsAggregation, MachineParameterStatistics.class).log(log.getName());
+        return mongoTemplate.aggregate(statisticsAggregation, MachineParameterStatistics.class)
+                .log(log.getName());
     }
 }

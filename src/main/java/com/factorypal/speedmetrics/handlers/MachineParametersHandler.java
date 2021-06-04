@@ -1,69 +1,66 @@
 package com.factorypal.speedmetrics.handlers;
 
-import com.factorypal.speedmetrics.domain.entities.Parameter;
-import com.factorypal.speedmetrics.domain.repositories.MachineParametersRepository;
-import com.factorypal.speedmetrics.domain.entities.MachineParameterStatistics;
 import com.factorypal.speedmetrics.mappers.RequestMapper;
+import com.factorypal.speedmetrics.schemas.MachineParametersResponse;
+import com.factorypal.speedmetrics.schemas.MachineStatisticsResponse;
 import com.factorypal.speedmetrics.schemas.ParametersRequest;
+import com.factorypal.speedmetrics.services.MachineParametersService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.web.reactive.function.BodyInserters.fromPublisher;
+import static org.springframework.web.reactive.function.BodyInserters.*;
 
 @Component
 @Slf4j
 public class MachineParametersHandler {
 
-    private static final int STATISTICS_MINUTES_DEFAULT_VALUE = 10;
+    @Value("${app.defaultLastMinutesStatistics:1}")
+    private int defaultLastMinutesStatistics;
 
-    private final MachineParametersRepository parametersService;
+    private final MachineParametersService parametersService;
 
-    public MachineParametersHandler(MachineParametersRepository parametersService) {
+    public MachineParametersHandler(MachineParametersService parametersService) {
         this.parametersService = parametersService;
     }
 
     public Mono<ServerResponse> listMachineParameters(ServerRequest request) {
         return ServerResponse
                 .ok().contentType(MediaType.APPLICATION_JSON)
-                .body(fromPublisher(parametersService.fetchLatestParameters(), Parameter.class));
+                .body(fromProducer(
+                        parametersService.getLatestParameters(),
+                        MachineParametersResponse.class
+                ))
+                .switchIfEmpty(Mono.empty());
     }
 
     public Mono<ServerResponse> addMachineParameters(ServerRequest request) {
-        Mono<ParametersRequest> parametersRequest = request.bodyToMono(ParametersRequest.class);
-
-        return parametersRequest
-                .flatMap(reqParam -> {
-                    List<Parameter> mappedParams = RequestMapper.toParameterList(reqParam);
-                    Flux<Parameter> insertedParams = parametersService.saveAll(mappedParams);
-                    insertedParams.doOnNext(parameter -> log.info(String.format("inserted: %s", parameter.getId())));
-
-                    var body = fromPublisher(insertedParams, Parameter.class);
-
-                    return ServerResponse
-                            .created(request.uri()).contentType(MediaType.APPLICATION_JSON)
-                            .body(body);
-                });
+        return request.bodyToMono(ParametersRequest.class)
+                .map(RequestMapper::toParameterList)
+                .map(parametersService::saveAll)
+                .flatMap(saveResponse -> ServerResponse
+                        .created(request.uri()).contentType(MediaType.APPLICATION_JSON)
+                        .body(fromProducer(saveResponse, MachineParametersResponse.class))
+                )
+                .switchIfEmpty(Mono.empty());
     }
 
     public Mono<ServerResponse> getMachineParametersStatistics(ServerRequest request) {
-        Hooks.onOperatorDebug();
-
         Optional<String> lastMinutesParam = request.queryParam("minutes");
-        String lastMinutes = lastMinutesParam.orElseGet(() -> String.valueOf(STATISTICS_MINUTES_DEFAULT_VALUE));
+        String lastMinutes = lastMinutesParam.orElseGet(() -> String.valueOf(defaultLastMinutesStatistics));
 
         return ServerResponse
                 .ok().contentType(MediaType.APPLICATION_JSON)
-                .body(fromPublisher(
-                        parametersService.getMachineParametersStatistics(Integer.parseInt(lastMinutes)), MachineParameterStatistics.class)
-                ).switchIfEmpty(Mono.empty());
+                .body(fromProducer(
+                        parametersService.getStatisticsForLastMinutes(Integer.parseInt(lastMinutes)),
+                        MachineStatisticsResponse.class
+                ))
+                .switchIfEmpty(Mono.empty());
     }
 }

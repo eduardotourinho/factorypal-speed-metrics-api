@@ -9,5 +9,4 @@ public class FactoryPalSpeedMetricsApplication {
     public static void main(String[] args) {
         SpringApplication.run(FactoryPalSpeedMetricsApplication.class, args);
     }
-
 }
