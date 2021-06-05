@@ -2,12 +2,12 @@ spring:
   data:
     mongodb:
       database: "machine_metrics"
-      host: "localhost"
+      host: "mongodb"
 
 app:
   defaultLastMinutesStatistics: 10
-  seedMachineFile: "docs/seed/machines.csv"
-  seedParametersFile: "docs/seed/parameters.csv"
+  seedMachineFile: "resources/seed/machines.csv"
+  seedParametersFile: "resources/seed/parameters.csv"
 
 logging:
   level:

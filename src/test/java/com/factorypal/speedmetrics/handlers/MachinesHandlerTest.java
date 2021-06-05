@@ -1,17 +1,13 @@
 package com.factorypal.speedmetrics.handlers;
 
-import com.factorypal.speedmetrics.FactoryPalSpeedMetricsApplication;
 import com.factorypal.speedmetrics.domain.entities.Machine;
 import com.factorypal.speedmetrics.domain.repositories.MachineRepository;
-import com.factorypal.speedmetrics.routers.MachineParameterRouter;
 import com.factorypal.speedmetrics.routers.MachinesRouter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;

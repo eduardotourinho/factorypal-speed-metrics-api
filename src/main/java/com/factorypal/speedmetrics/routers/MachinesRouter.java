@@ -17,7 +17,7 @@ public class MachinesRouter {
     public RouterFunction<ServerResponse> machineRoutes(MachinesHandler machinesHandler) {
         return route()
                 .path("/machines", builder -> builder
-                        .GET(accept(MediaType.APPLICATION_JSON), machinesHandler::listAllMachines)
+                        .GET("", accept(MediaType.APPLICATION_JSON), machinesHandler::listAllMachines)
                 )
                 .build();
     }

@@ -1,19 +1,17 @@
 package com.factorypal.speedmetrics.handlers;
 
+import com.factorypal.speedmetrics.config.ApplicationConfig;
 import com.factorypal.speedmetrics.mappers.RequestMapper;
 import com.factorypal.speedmetrics.schemas.MachineParametersResponse;
 import com.factorypal.speedmetrics.schemas.MachineStatisticsResponse;
 import com.factorypal.speedmetrics.schemas.ParametersRequest;
 import com.factorypal.speedmetrics.services.MachineParametersService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 import static org.springframework.web.reactive.function.BodyInserters.*;
 
@@ -21,12 +19,11 @@ import static org.springframework.web.reactive.function.BodyInserters.*;
 @Slf4j
 public class MachineParametersHandler {
 
-    @Value("${app.defaultLastMinutesStatistics:1}")
-    private int defaultLastMinutesStatistics;
-
+    private final ApplicationConfig appConfig;
     private final MachineParametersService parametersService;
 
-    public MachineParametersHandler(MachineParametersService parametersService) {
+    public MachineParametersHandler(ApplicationConfig appConfig, MachineParametersService parametersService) {
+        this.appConfig = appConfig;
         this.parametersService = parametersService;
     }
 
@@ -52,13 +49,13 @@ public class MachineParametersHandler {
     }
 
     public Mono<ServerResponse> getMachineParametersStatistics(ServerRequest request) {
-        Optional<String> lastMinutesParam = request.queryParam("minutes");
-        String lastMinutes = lastMinutesParam.orElseGet(() -> String.valueOf(defaultLastMinutesStatistics));
+        String lastMinutesQp = request.queryParam("minutes")
+                .orElseGet(appConfig::getStatisticsFromDefaultMinutes);
 
         return ServerResponse
                 .ok().contentType(MediaType.APPLICATION_JSON)
                 .body(fromProducer(
-                        parametersService.getStatisticsForLastMinutes(Integer.parseInt(lastMinutes)),
+                        parametersService.getStatisticsForLastMinutes(Integer.parseInt(lastMinutesQp)),
                         MachineStatisticsResponse.class
                 ))
                 .switchIfEmpty(Mono.empty());

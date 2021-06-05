@@ -8,7 +8,9 @@ import com.factorypal.speedmetrics.schemas.*;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.util.Date;
 import java.util.List;
+
 @Component
 public class MachineParametersService {
 
