@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class MachineStatisticsResponse {
-    private String key;
+    private String machine;
     private List<ParametersStatisticsResponse> parameters;
 }

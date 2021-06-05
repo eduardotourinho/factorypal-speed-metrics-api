@@ -6,8 +6,8 @@ spring:
 
 app:
   defaultLastMinutesStatistics: 10
-  seedMachineFile: "resources/seed/machines.csv"
-  seedParametersFile: "resources/seed/parameters.csv"
+  seedMachineFile: "docs/seed/machines.csv"
+  seedParametersFile: "docs/seed/parameters.csv"
 
 logging:
   level:

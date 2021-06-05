@@ -1,5 +1,7 @@
 package com.factorypal.speedmetrics.domain.entities;
 
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,11 +22,17 @@ import java.util.Date;
 public class Parameter {
 
     @Id
+    @CsvIgnore
     private ObjectId id;
+
+    @CsvBindByName(column = "machine_key", required = true)
     private String machineKey;
 
+    @CsvBindByName(required = true)
     private String key;
-    private Double value;
+
+    @CsvBindByName(required = true)
+    private double value;
 
     @CreatedDate
     private Date createdAt;
