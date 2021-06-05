@@ -1,6 +1,7 @@
 package com.factorypal.speedmetrics.domain.entities;
 
 import lombok.*;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 

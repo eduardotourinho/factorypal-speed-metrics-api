@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      dockerfile: docker/service.dockerfile
+      context: .
+    environment:
+      spring_profiles_active: docker
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+    networks:
+      factorypal-api-network:
+
+  api-test:
+    build:
+      dockerfile: docker/test.dockerfile
+      context: .
+    environment:
+      spring_profiles_active: test
+    entrypoint: "gradle test -Dkarate.env=docker"
+    depends_on:
+      - api
+    links:
+      - api
+    networks:
+      factorypal-api-network:
+
+  mongodb:
+    image: "mongo:4.4.6"
+    ports:
+      - 27017:27017
+    networks:
+      factorypal-api-network:
+
+networks:
+  factorypal-api-network:
