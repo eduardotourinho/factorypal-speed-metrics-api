@@ -17,7 +17,6 @@ WORKDIR /app
 COPY --from=build /home/gradle/src/docs/seed ./resources/seed
 COPY --from=build ${BUILD_DIST} .
 
-RUN ls -l
 EXPOSE 8080
 
 ENTRYPOINT ["bin/factorypal-speed-metrics"]

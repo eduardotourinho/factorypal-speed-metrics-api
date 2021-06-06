@@ -12,7 +12,7 @@
 
 ## OpenAPI docs
 
-http://localhost:8080/api-doc
+http://localhost:8080/api-docs
 
 ## Tech stack
 
