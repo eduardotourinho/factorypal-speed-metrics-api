@@ -1,5 +1,6 @@
 package com.factorypal.speedmetrics.handlers;
 
+import com.factorypal.speedmetrics.config.ApplicationConfig;
 import com.factorypal.speedmetrics.domain.entities.Parameter;
 import com.factorypal.speedmetrics.domain.repositories.MachineParametersRepository;
 import com.factorypal.speedmetrics.routers.MachineParameterRouter;
@@ -27,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MachineParameterRouter.class, MachineParametersHandler.class, MachineParametersService.class})
+@ContextConfiguration(classes = {MachineParameterRouter.class, MachineParametersHandler.class, MachineParametersService.class, ApplicationConfig.class})
 @WebFluxTest
 class MachineParametersHandlerTest {
 

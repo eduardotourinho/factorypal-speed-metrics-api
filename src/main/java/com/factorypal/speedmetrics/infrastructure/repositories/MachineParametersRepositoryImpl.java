@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.MongoExpression;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Queue;
 
 
 @Repository
@@ -30,7 +32,7 @@ public class MachineParametersRepositoryImpl implements MachineParametersReposit
 
     @Override
     public Mono<Long> count() {
-        return mongoTemplate.estimatedCount(Parameter.class);
+        return mongoTemplate.count(new Query(), Parameter.class);
     }
 
     @Override

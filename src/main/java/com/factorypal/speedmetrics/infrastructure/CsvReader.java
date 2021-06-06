@@ -1,4 +1,4 @@
-package com.factorypal.speedmetrics.services;
+package com.factorypal.speedmetrics.infrastructure;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -15,6 +15,7 @@ public class CsvReader<T> {
                 .withIgnoreLeadingWhiteSpace(true)
                 .withIgnoreQuotations(true)
                 .withIgnoreEmptyLine(true)
+                .withThrowExceptions(true)
                 .build();
 
         return csvToBean.parse();

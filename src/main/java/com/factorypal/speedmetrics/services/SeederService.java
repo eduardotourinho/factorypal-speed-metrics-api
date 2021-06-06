@@ -5,6 +5,8 @@ import com.factorypal.speedmetrics.domain.entities.Machine;
 import com.factorypal.speedmetrics.domain.entities.Parameter;
 import com.factorypal.speedmetrics.domain.repositories.MachineParametersRepository;
 import com.factorypal.speedmetrics.domain.repositories.MachineRepository;
+import com.factorypal.speedmetrics.infrastructure.CsvReader;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -12,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
+@Slf4j
 public class SeederService {
 
     private final ApplicationConfig appConfig;
@@ -24,45 +27,39 @@ public class SeederService {
         this.machineParametersRepository = machineParametersRepository;
     }
 
+    public void seedMachines() {
+        Long count = machineRepository.count().block();
+        if (count == null || count > 0) {
+            return;
+        }
 
-    public void seed() {
-        seedMachines();
-        seedMachineParameters();
+        log.debug("Seeding machines collection");
+        var csvReader = new CsvReader<Machine>();
+        try {
+            List<Machine> machineSeed = csvReader.read(appConfig.getSeedMachineFile(), Machine.class);
+            machineRepository.insert(machineSeed).blockLast();
+        } catch (FileNotFoundException e) {
+            log.error("Could not import machine seed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    private void seedMachines() {
-        machineRepository.count()
-                .subscribe(
-                        s -> {
-                            if (s == 0) {
-                                var csvReader = new CsvReader<Machine>();
-                                try {
-                                    List<Machine> machineSeed = csvReader.read(appConfig.getSeedMachineFile(), Machine.class);
-                                    machineRepository.insert(machineSeed).blockLast();
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                );
-    }
+    public void seedMachineParameters() {
+        Long count = machineParametersRepository.count().block();
+        if (count == null || count > 0) {
+            return;
+        }
 
-    private void seedMachineParameters() {
-        machineParametersRepository.count()
-                .subscribe(
-                        s -> {
-                            if (s == 0) {
-                                var csvReader = new CsvReader<Parameter>();
-                                try {
-                                    List<Parameter> parameterList = csvReader.read(appConfig.getSeedMachineParameters(), Parameter.class);
-                                    parameterList.forEach(parameter -> parameter.setCreatedAt(new Date()));
-                                    machineParametersRepository.saveAll(parameterList).blockLast();
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
+        log.debug("Seeding parameters collection");
+        var csvReader = new CsvReader<Parameter>();
+        try {
+            List<Parameter> parameterList = csvReader.read(appConfig.getSeedMachineParameters(), Parameter.class);
+            parameterList.forEach(parameter -> parameter.setCreatedAt(new Date()));
+            machineParametersRepository.saveAll(parameterList).log(log.getName()).blockLast();
 
-                            }
-                        }
-                );
+        } catch (FileNotFoundException e) {
+            log.error("Could not import parameters seed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

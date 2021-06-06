@@ -2,3 +2,8 @@ spring:
   data:
     mongodb:
       database: "machine_metrics_test"
+
+app:
+  defaultLastMinutesStatistics: 10
+  seedMachineFile: "src/test/resources/seed/machines.csv"
+  seedParametersFile: "src/test/resources/seed/parameters.csv"

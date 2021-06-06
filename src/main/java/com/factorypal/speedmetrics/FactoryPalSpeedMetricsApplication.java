@@ -8,18 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class FactoryPalSpeedMetricsApplication {
 
-    private final SeederService seederService;
-
-    public FactoryPalSpeedMetricsApplication(SeederService seederService) {
-        this.seederService = seederService;
-        seedData();
-    }
-
     public static void main(String[] args) {
         SpringApplication.run(FactoryPalSpeedMetricsApplication.class, args);
-    }
-
-    private void seedData() {
-        seederService.seed();
     }
 }
