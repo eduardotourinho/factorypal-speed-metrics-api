@@ -8,7 +8,7 @@
 
 **API**: `docker-compose up api`
 
-**Tests**: `docker-compose run api-test` - This will run all tests (Unit + Karate tests)
+**Tests**: `docker-compose run --rm api-test` - This will run all tests (Unit + Karate tests)
 
 ## OpenAPI docs
 

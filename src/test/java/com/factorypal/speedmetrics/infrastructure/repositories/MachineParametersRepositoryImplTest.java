@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -17,10 +18,8 @@ import reactor.test.StepVerifier;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,13 +35,12 @@ class MachineParametersRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
-        mongoOperations.createCollection(Parameter.class).block();
         repository = new MachineParametersRepositoryImpl(mongoOperations);
     }
 
     @AfterEach
     void clean() {
-        mongoOperations.dropCollection(Parameter.class).block();
+        mongoOperations.remove(new Query(), Parameter.class).block();
     }
 
     @Test
@@ -53,6 +51,7 @@ class MachineParametersRepositoryImplTest {
                 Parameter.builder().machineKey("machine1").key("speed").value(2d).createdAt(now).build(),
                 Parameter.builder().machineKey("machine1").key("speed").value(3d).createdAt(now).build()
         );
+
         Flux<Parameter> inserted = repository.saveAll(parameters);
 
         StepVerifier
@@ -135,10 +134,13 @@ class MachineParametersRepositoryImplTest {
                 Parameter.builder().machineKey("machine2").key("load").value(30d).createdAt(now).build(),
                 Parameter.builder().machineKey("machine2").key("load").value(9d).createdAt(now).build()
         );
+
+        mongoOperations.dropCollection(Parameter.class).block();
+        assertEquals(0, repository.count().block());
+
         repository.saveAll(parameters).blockLast();
 
-        Flux<MachineParameterStatistics> statistics = repository.getMachineParametersStatistics(10);
-
+        Flux<MachineParameterStatistics> statistics = repository.getMachineParametersStatistics(1);
         StepVerifier
                 .create(statistics)
                 .assertNext(statistic -> {

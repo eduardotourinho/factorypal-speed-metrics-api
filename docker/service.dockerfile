@@ -11,11 +11,13 @@ FROM adoptopenjdk:11-jre-openj9
 
 ARG BUILD_DIST=/home/gradle/src/build/install/factorypal-speed-metrics-boot
 
-RUN mkdir -p /opt/app
-WORKDIR /opt/app
+RUN mkdir -p /app
+WORKDIR /app
 
+COPY --from=build /home/gradle/src/docs/seed ./resources/seed
 COPY --from=build ${BUILD_DIST} .
 
+RUN ls -l
 EXPOSE 8080
 
 ENTRYPOINT ["bin/factorypal-speed-metrics"]

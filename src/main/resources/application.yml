@@ -6,7 +6,7 @@ spring:
 
 springdoc:
   swagger-ui:
-    path: "api-doc"
+    path: "api-docs"
 
 app:
   defaultLastMinutesStatistics: 10
