@@ -4,6 +4,10 @@ spring:
       database: "machine_metrics"
       host: "localhost"
 
+springdoc:
+  swagger-ui:
+    path: "api-doc"
+
 app:
   defaultLastMinutesStatistics: 10
   seedMachineFile: "docs/seed/machines.csv"

@@ -20,8 +20,4 @@ public class Machine {
 
     @CsvBindByName(required = true)
     private String name;
-
-    @DBRef
-    @CsvIgnore
-    private List<Parameter> parameters;
 }
